@@ -1,7 +1,12 @@
+var Number WT_queuedTemp = null
+var Timer WT_timer = null
 
-import java.util.concurrent.locks.ReentrantLock
+var Number BT_queuedTemp = null
+var Timer BT_timer = null
 
-val ReentrantLock downward_lock = new ReentrantLock
+var Number ST_queuedTemp = null
+var Timer ST_timer = null
+
 
 //
 // Wohnzimmer Thermostat - Commands from GA / HK
@@ -24,21 +29,23 @@ rule "WT_downward3"
 when
     Item Wohnzimmer_Thermostat_set received command 
 then
-    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+    WT_queuedTemp = receivedCommand
+    if(WT_timer === null) {
+        WT_timer = createTimer(now, [ |
+            if(WT_queuedTemp !== null) {
+		var temp = WT_queuedTemp
+		WT_queuedTemp = null
+		logWarn("HOMEMATIC", "Thermostat Wohnzimmer - GA / HK binding: " + temp)
+		Wohnzimmer_Thermostat_set.postUpdate(temp)
+		Thread::sleep(100)
+		WT1_set.sendCommand(temp)
+		WT2_set.sendCommand(temp)
+		WT3_set.sendCommand(temp)
+            }
 
-    try {
-        downward_lock.lock()
-        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - GA / HK binding: " + temp)
-        Wohnzimmer_Thermostat_set.postUpdate(temp)
-        Thread::sleep(250)
-        WT1_set.sendCommand(temp)
-        WT2_set.sendCommand(temp)
-        WT3_set.sendCommand(temp)
-        Thread::sleep(1250)
-    } catch(Throwable t) { }
-    finally {
-        downward_lock.unlock()
-    }
+            WT_timer.reschedule(now.plusMillis(250))
+        ])
+   }
 end
 
 //
@@ -55,19 +62,21 @@ rule "ST_downward2"
 when
     Item Schlafzimmer_Thermostat_set received command 
 then
-    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+    ST_queuedTemp = receivedCommand
+    if(ST_timer === null) {
+        ST_timer = createTimer(now, [ |
+            if(ST_queuedTemp !== null) {
+		var temp = ST_queuedTemp
+		ST_queuedTemp = null
+		logWarn("HOMEMATIC", "Thermostat Schlafzimmer - GA / HK binding: " + temp)
+		Schlafzimmer_Thermostat_set.postUpdate(temp)
+		Thread::sleep(100)
+		ST1_set.sendCommand(temp)
+            }
 
-    try {
-        downward_lock.lock()
-    	logWarn("HOMEMATIC", "Thermostat Schlafzimmer - GA binding: " + temp)
-    	Schlafzimmer_Thermostat_set.postUpdate(temp)
-        Thread::sleep(250)
-    	ST1_set.sendCommand(temp)
-        Thread::sleep(1250)
-    } catch(Throwable t) { }
-    finally {
-        downward_lock.unlock()
-    }
+            ST_timer.reschedule(now.plusMillis(250))
+        ])
+   }
 end
 
 //
@@ -84,19 +93,21 @@ rule "BT_downward2"
 when
     Item Bad_Thermostat_set received command 
 then
-    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+    BT_queuedTemp = receivedCommand
+    if(BT_timer === null) {
+        BT_timer = createTimer(now, [ |
+            if(BT_queuedTemp !== null) {
+		var temp = BT_queuedTemp
+		BT_queuedTemp = null
+		logWarn("HOMEMATIC", "Thermostat Bad - GA / HK binding: " + temp)
+		Bad_Thermostat_set.postUpdate(temp)
+		Thread::sleep(100)
+		BT1_set.sendCommand(temp)
+            }
 
-    try {
-        downward_lock.lock()
-        logWarn("HOMEMATIC", "Thermostat Bad - GA binding: " + temp)
-        Bad_Thermostat_set.postUpdate(temp)
-        Thread::sleep(250)
-        BT1_set.sendCommand(temp)
-        Thread::sleep(1250)
-    } catch(Throwable t) { }
-    finally {
-        downward_lock.unlock()
-    }
+            BT_timer.reschedule(now.plusMillis(250))
+        ])
+   }
 end
 
 //
