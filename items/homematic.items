@@ -1,21 +1,3 @@
-//Group 			g_Wohnzimmer_Thermostat_1 	"Wohnzimmer Thermostat (1)" 					[ "Thermostat"]
-  //String 		Wohnzimmer_Thermostat_1_mode_h 	"Wohnzimmer Mode (1)" 	    (g_Wohnzimmer_Thermostat_1) 	[ "homekit:HeatingCoolingMode" ] { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#CONTROL_MODE" }
-  //String 		Wohnzimmer_Thermostat_1_mode 	"Wohnzimmer Mode (1)" 	    (g_Wohnzimmer_Thermostat_1) 	[ "HeatingCoolingMode" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#CONTROL_MODE" }
-  //Number:Temperature 	Wohnzimmer_Thermostat_1_cur 	"Wohnzimmer Ist (1)"        (g_Wohnzimmer_Thermostat_1) 	[ "CurrentTemperature" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#ACTUAL_TEMPERATURE" }
-  //Number:Temperature	Wohnzimmer_Thermostat_1_set 	"Wohnzimmer Soll (1)"       (g_Wohnzimmer_Thermostat_1) 	[ "TargetTemperature" ]   	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#SET_TEMPERATURE" }
-
-//Group 			g_Wohnzimmer_Thermostat_2 	"Wohnzimmer Thermostat (2)" 					[ "Thermostat"]
-  //String 		Wohnzimmer_Thermostat_2_mode_h 	"Wohnzimmer Mode (2)" 	    (g_Wohnzimmer_Thermostat_2) 	[ "homekit:HeatingCoolingMode" ] { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844896:4#CONTROL_MODE" }
-  //String 		Wohnzimmer_Thermostat_2_mode 	"Wohnzimmer Mode (2)" 	    (g_Wohnzimmer_Thermostat_2) 	[ "HeatingCoolingMode" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844896:4#CONTROL_MODE" }
-  //Number:Temperature	Wohnzimmer_Thermostat_2_cur 	"Wohnzimmer Ist (2)" 	    (g_Wohnzimmer_Thermostat_2) 	[ "CurrentTemperature" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844896:4#ACTUAL_TEMPERATURE" }
-  //Number:Temperature	Wohnzimmer_Thermostat_2_set 	"Wohnzimmer Soll (2)"       (g_Wohnzimmer_Thermostat_2) 	[ "TargetTemperature" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844896:4#SET_TEMPERATURE" }
-
-//Group 			g_Wohnzimmer_Thermostat_3 	"Wohnzimmer Thermostat (3)" 					[ "Thermostat"]
-  //String 		Wohnzimmer_Thermostat_3_mode_h 	"Wohnzimmer Mode (3)" 	    (g_Wohnzimmer_Thermostat_3) 	[ "homekit:HeatingCoolingMode" ] { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844904:4#CONTROL_MODE" }
-  //String 		Wohnzimmer_Thermostat_3_mode 	"Wohnzimmer Mode (3)" 	    (g_Wohnzimmer_Thermostat_3) 	[ "HeatingCoolingMode" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844904:4#CONTROL_MODE" }
-  //Number:Temperature	Wohnzimmer_Thermostat_3_cur 	"Wohnzimmer Ist (3)" 	    (g_Wohnzimmer_Thermostat_3) 	[ "CurrentTemperature" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844904:4#ACTUAL_TEMPERATURE" }
-  //Number:Temperature	Wohnzimmer_Thermostat_3_set 	"Wohnzimmer Soll (3)"       (g_Wohnzimmer_Thermostat_3) 	[ "TargetTemperature" ] 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844904:4#SET_TEMPERATURE" }
-
 
 String 			WT1_mode 	"Wohnzimmer Mode (1)" 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#CONTROL_MODE" }
 Number:Temperature 	WT1_cur 	"Wohnzimmer Ist (1)" 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0844877:4#ACTUAL_TEMPERATURE" }
@@ -37,21 +19,36 @@ String 			ST1_mode 	"Schlafzimmer Mode" 	 { channel="homematic:HM-CC-RT-DN:ccu:L
 Number:Temperature 	ST1_cur 	"Schlafzimmer Ist" 	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0846131:4#ACTUAL_TEMPERATURE" }
 Number:Temperature	ST1_set 	"Schlafzimmer Soll"    	 { channel="homematic:HM-CC-RT-DN:ccu:LEQ0846131:4#SET_TEMPERATURE" }
 
-Group 			g_Wohnzimmer_Thermostat 	"Wohnzimmer Thermostat" 								[ "Thermostat"]
-Group 			g_HK_Wohnzimmer_Thermostat 	"Wohnzimmer Thermostat (HK)" 								[ "Thermostat"]
-  String 		Wohnzimmer_Thermostat_mode 	"Wohnzimmer Mode" 	    (g_Wohnzimmer_Thermostat) 					[ "HeatingCoolingMode" ]
-  String 		HK_Wohnzimmer_Thermostat_mode 	"Wohnzimmer Mode (HK)" 	    (g_HK_Wohnzimmer_Thermostat) 				[ "homekit:HeatingCoolingMode" ]
-  Number:Temperature 	Wohnzimmer_Thermostat_cur 	"Wohnzimmer Ist"            (g_Wohnzimmer_Thermostat, g_HK_Wohnzimmer_Thermostat) 	[ "CurrentTemperature" ]
-  Number:Temperature	Wohnzimmer_Thermostat_set 	"Wohnzimmer Soll"           (g_Wohnzimmer_Thermostat, g_HK_Wohnzimmer_Thermostat) 	[ "TargetTemperature" ] { autoupdate="false" }
 
-Group 			g_Bad_Thermostat 		"Bad Thermostat" 									[ "Thermostat"]
-  String 		Bad_Thermostat_mode 		"Bad Mode" 	     	    (g_Bad_Thermostat) 						[ "HeatingCoolingMode" ]
-  Number:Temperature 	Bad_Thermostat_cur 		"Bad Ist"            	    (g_Bad_Thermostat) 						[ "CurrentTemperature" ]
-  Number:Temperature	Bad_Thermostat_set 		"Bad Soll"           	    (g_Bad_Thermostat) 						[ "TargetTemperature" ] { autoupdate="false" }
+Group 			g_Wohnzimmer_Thermostat 	"Wohnzimmer Thermostat" 						[ "Thermostat"]
+  String 		Wohnzimmer_Thermostat_mode 	"Wohnzimmer Mode" 	    (g_Wohnzimmer_Thermostat) 			[ "HeatingCoolingMode" ]
+  Number:Temperature 	Wohnzimmer_Thermostat_cur 	"Wohnzimmer Ist"            (g_Wohnzimmer_Thermostat) 			[ "CurrentTemperature" ]
+  Number:Temperature	Wohnzimmer_Thermostat_set 	"Wohnzimmer Soll"           (g_Wohnzimmer_Thermostat) 			[ "TargetTemperature" ] { autoupdate="false" }
 
-Group 			g_Schlafzimmer_Thermostat 	"Schlafzimmer Thermostat" 								[ "Thermostat"]
-  String 		Schlafzimmer_Thermostat_mode 	"Schlafzimmer Mode" 	    (g_Schlafzimmer_Thermostat) 				[ "HeatingCoolingMode" ]
-  Number:Temperature 	Schlafzimmer_Thermostat_cur 	"Schlafzimmer Ist"          (g_Schlafzimmer_Thermostat) 				[ "CurrentTemperature" ]
-  Number:Temperature	Schlafzimmer_Thermostat_set 	"Schlafzimmer Soll"         (g_Schlafzimmer_Thermostat) 				[ "TargetTemperature" ] { autoupdate="false" }
+Group 			g_HK_Wohnzimmer_Thermostat 	"Wohnzimmer Thermostat (HK)" 						[ "Thermostat"]
+  String 		HK_Wohnzimmer_Thermostat_mode 	"Wohnzimmer Mode (HK)" 	    (g_HK_Wohnzimmer_Thermostat) 		[ "homekit:HeatingCoolingMode" ]
+  Number:Temperature 	HK_Wohnzimmer_Thermostat_cur 	"Wohnzimmer Ist (HK)"        (g_HK_Wohnzimmer_Thermostat) 		[ "CurrentTemperature" ]
+  Number:Temperature	HK_Wohnzimmer_Thermostat_set 	"Wohnzimmer Soll (HK)"       (g_HK_Wohnzimmer_Thermostat) 		[ "TargetTemperature" ] { autoupdate="false" }
 
+
+Group 			g_Bad_Thermostat 		"Bad Thermostat" 							[ "Thermostat"]
+  String 		Bad_Thermostat_mode 		"Bad Mode" 	     	    (g_Bad_Thermostat) 				[ "HeatingCoolingMode" ]
+  Number:Temperature 	Bad_Thermostat_cur 		"Bad Ist"            	    (g_Bad_Thermostat) 				[ "CurrentTemperature" ]
+  Number:Temperature	Bad_Thermostat_set 		"Bad Soll"           	    (g_Bad_Thermostat) 				[ "TargetTemperature" ] { autoupdate="false" }
+
+Group 			g_HK_Bad_Thermostat 		"Bad Thermostat (HK)" 							[ "Thermostat"]
+  String 		HK_Bad_Thermostat_mode 		"Bad Mode (HK)" 	    (g_HK_Bad_Thermostat) 			[ "homekit:HeatingCoolingMode" ]
+  Number:Temperature 	HK_Bad_Thermostat_cur 		"Bad Ist (HK)"        	    (g_HK_Bad_Thermostat) 			[ "CurrentTemperature" ]
+  Number:Temperature	HK_Bad_Thermostat_set 		"Bad Soll (HK)"       	    (g_HK_Bad_Thermostat) 			[ "TargetTemperature" ] { autoupdate="false" }
+
+
+Group 			g_Schlafzimmer_Thermostat 	"Schlafzimmer Thermostat" 						[ "Thermostat"]
+  String 		Schlafzimmer_Thermostat_mode 	"Schlafzimmer Mode" 	    (g_Schlafzimmer_Thermostat) 		[ "HeatingCoolingMode" ]
+  Number:Temperature 	Schlafzimmer_Thermostat_cur 	"Schlafzimmer Ist"          (g_Schlafzimmer_Thermostat) 		[ "CurrentTemperature" ]
+  Number:Temperature	Schlafzimmer_Thermostat_set 	"Schlafzimmer Soll"         (g_Schlafzimmer_Thermostat) 		[ "TargetTemperature" ] { autoupdate="false" }
+
+Group 			g_HK_Schlafzimmer_Thermostat 	"Schlafzimmer Thermostat (HK)" 						[ "Thermostat"]
+  String 		HK_Schlafzimmer_Thermostat_mode "Schlafzimmer Mode (HK)"       (g_HK_Schlafzimmer_Thermostat) 		[ "homekit:HeatingCoolingMode" ]
+  Number:Temperature 	HK_Schlafzimmer_Thermostat_cur 	"Schlafzimmer Ist (HK)"        (g_HK_Schlafzimmer_Thermostat) 		[ "CurrentTemperature" ]
+  Number:Temperature	HK_Schlafzimmer_Thermostat_set 	"Schlafzimmer Soll (HK)"       (g_HK_Schlafzimmer_Thermostat) 		[ "TargetTemperature" ] { autoupdate="false" }
 

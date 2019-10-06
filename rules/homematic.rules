@@ -1,12 +1,47 @@
-var Number WT_queuedTemp = null
+var timer_millis = 5000
+
+var double WT_set = 18.0
+var Boolean WT_prevent_manual = false
 var Timer WT_timer = null
 
-var Number BT_queuedTemp = null
+var double BT_set = 18.0
+var Boolean BT_prevent_manual = false
 var Timer BT_timer = null
 
-var Number ST_queuedTemp = null
+var double ST_set = 18.0
+var Boolean ST_prevent_manual = false
 var Timer ST_timer = null
 
+rule "WT_init"
+when
+    System started
+then
+    logWarn("HOMEMATIC", "Setting initials")
+
+    HK_Wohnzimmer_Thermostat_mode.postUpdate("HeatOn")
+    HK_Schlafzimmer_Thermostat_mode.postUpdate("HeatOn")
+    HK_Bad_Thermostat_mode.postUpdate("HeatOn")
+
+    WT1_cur.postUpdate(18.0)
+    WT1_set.postUpdate(18.0)
+    WT2_cur.postUpdate(18.0)
+    WT2_set.postUpdate(18.0)
+    WT3_cur.postUpdate(18.0)
+    WT3_set.postUpdate(18.0)
+    ST1_cur.postUpdate(18.0)
+    ST1_set.postUpdate(18.0)
+    BT1_cur.postUpdate(18.0)
+    BT1_set.postUpdate(18.0)
+
+    Wohnzimmer_Thermostat_set.postUpdate(18.0)
+    HK_Wohnzimmer_Thermostat_set.postUpdate(18.0)
+
+    Schlafzimmer_Thermostat_set.postUpdate(18.0)
+    HK_Schlafzimmer_Thermostat_set.postUpdate(18.0)
+
+    Bad_Thermostat_set.postUpdate(18.0)
+    HK_Bad_Thermostat_set.postUpdate(18.0)
+end
 
 //
 // Wohnzimmer Thermostat - Commands from GA / HK
@@ -27,30 +62,47 @@ end
 
 rule "WT_downward3"
 when
-    Item Wohnzimmer_Thermostat_set received command 
+    Item Wohnzimmer_Thermostat_set received command or
+    Item HK_Wohnzimmer_Thermostat_set received command
 then
-    WT_queuedTemp = receivedCommand
+    WT_set = Math.round((receivedCommand as Number).doubleValue * 2.0) / 2.0
+    WT_prevent_manual = true
     if(WT_timer === null) {
         WT_timer = createTimer(now, [ |
-            if(WT_queuedTemp !== null) {
-		var temp = WT_queuedTemp
-		WT_queuedTemp = null
-		logWarn("HOMEMATIC", "Thermostat Wohnzimmer - GA / HK binding: " + temp)
-		Wohnzimmer_Thermostat_set.postUpdate(temp)
-		Thread::sleep(100)
-		WT1_set.sendCommand(temp)
-		WT2_set.sendCommand(temp)
-		WT3_set.sendCommand(temp)
+            WT_prevent_manual = false
+            var WT1_set_state = Math.round((WT1_set.state as Number).doubleValue * 2.0) / 2.0
+            var WT2_set_state = Math.round((WT2_set.state as Number).doubleValue * 2.0) / 2.0
+            var WT3_set_state = Math.round((WT3_set.state as Number).doubleValue * 2.0) / 2.0
+            if(WT_set != WT1_set_state) {
+	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (1): " + WT_set + " (before: " + WT1_set.state + ")")
+
+	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        WT1_set.sendCommand(WT_set)
+            }
+            if(WT_set != WT2_set_state) {
+	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (2): " + WT_set + " (before: " + WT2_set.state + ")")
+
+	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        WT2_set.sendCommand(WT_set)
+            }
+            if(WT_set != WT3_set_state) {
+	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (3): " + WT_set + " (before: " + WT3_set.state + ")")
+
+	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	        WT3_set.sendCommand(WT_set)
             }
 
-            WT_timer.reschedule(now.plusMillis(250))
+            WT_timer.reschedule(now.plusMillis(timer_millis))
         ])
    }
 end
 
-//
-// Schlafzimmer Thermostat - Commands from GA / HK
-//
+////
+//// Schlafzimmer Thermostat - Commands from GA / HK
+////
 rule "ST_downward1"
 when
     Item Schlafzimmer_Thermostat_mode received command 
@@ -60,28 +112,38 @@ end
 
 rule "ST_downward2"
 when
-    Item Schlafzimmer_Thermostat_set received command 
+    Item HK_Schlafzimmer_Thermostat_mode received command 
 then
-    ST_queuedTemp = receivedCommand
+    logWarn("HOMEMATIC", "Thermostat Schlafzimmer - HK binding: " + receivedCommand)
+end
+
+rule "ST_downward3"
+when
+    Item Schlafzimmer_Thermostat_set received command or
+    Item HK_Schlafzimmer_Thermostat_set received command
+then
+    ST_set = Math.round((receivedCommand as Number).doubleValue * 2.0) / 2.0
+    ST_prevent_manual = true
     if(ST_timer === null) {
         ST_timer = createTimer(now, [ |
-            if(ST_queuedTemp !== null) {
-		var temp = ST_queuedTemp
-		ST_queuedTemp = null
-		logWarn("HOMEMATIC", "Thermostat Schlafzimmer - GA / HK binding: " + temp)
-		Schlafzimmer_Thermostat_set.postUpdate(temp)
-		Thread::sleep(100)
-		ST1_set.sendCommand(temp)
+            ST_prevent_manual = false
+            var ST1_set_state = Math.round((ST1_set.state as Number).doubleValue * 2.0) / 2.0
+            if(ST_set != ST1_set_state) {
+	        logWarn("HOMEMATIC", "Thermostat Schlafzimmer - Forcing downward: " + ST_set + " (before: " + ST1_set.state + ")")
+
+	        Schlafzimmer_Thermostat_set.postUpdate(ST_set)
+	        HK_Schlafzimmer_Thermostat_set.postUpdate(ST_set)
+	        ST1_set.sendCommand(ST_set)
             }
 
-            ST_timer.reschedule(now.plusMillis(250))
+            ST_timer.reschedule(now.plusMillis(timer_millis))
         ])
    }
 end
 
-//
-// Bad Thermostat - Commands from GA / HK
-//
+////
+//// Bad Thermostat - Commands from GA / HK
+////
 rule "BT_downward1"
 when
     Item Bad_Thermostat_mode received command 
@@ -91,21 +153,31 @@ end
 
 rule "BT_downward2"
 when
-    Item Bad_Thermostat_set received command 
+    Item HK_Bad_Thermostat_mode received command 
 then
-    BT_queuedTemp = receivedCommand
+    logWarn("HOMEMATIC", "Thermostat Bad - HK binding: " + receivedCommand)
+end
+
+rule "BT_downward3"
+when
+    Item Bad_Thermostat_set received command or
+    Item HK_Bad_Thermostat_set received command
+then
+    BT_set = Math.round((receivedCommand as Number).doubleValue * 2.0) / 2.0
+    BT_prevent_manual = true
     if(BT_timer === null) {
         BT_timer = createTimer(now, [ |
-            if(BT_queuedTemp !== null) {
-		var temp = BT_queuedTemp
-		BT_queuedTemp = null
-		logWarn("HOMEMATIC", "Thermostat Bad - GA / HK binding: " + temp)
-		Bad_Thermostat_set.postUpdate(temp)
-		Thread::sleep(100)
-		BT1_set.sendCommand(temp)
+            BT_prevent_manual = false
+            var BT1_set_state = Math.round((BT1_set.state as Number).doubleValue * 2.0) / 2.0
+            if(BT_set != BT1_set_state) {
+	        logWarn("HOMEMATIC", "Thermostat Bad - Forcing downward: " + BT_set + " (before: " + BT1_set.state + ")")
+
+	        Bad_Thermostat_set.postUpdate(BT_set)
+	        HK_Bad_Thermostat_set.postUpdate(BT_set)
+	        BT1_set.sendCommand(BT_set)
             }
 
-            BT_timer.reschedule(now.plusMillis(250))
+            BT_timer.reschedule(now.plusMillis(timer_millis))
         ])
    }
 end
@@ -119,7 +191,9 @@ when
     Item WT2_cur changed or
     Item WT3_cur changed
 then
-    Wohnzimmer_Thermostat_cur.postUpdate(((WT1_cur.state as Number).doubleValue + (WT2_cur.state as Number).doubleValue + (WT3_cur.state as Number).doubleValue) / 3.0)
+    var temp = ((WT1_cur.state as Number).doubleValue + (WT2_cur.state as Number).doubleValue + (WT3_cur.state as Number).doubleValue) / 3.0
+    Wohnzimmer_Thermostat_cur.postUpdate(temp)
+    HK_Wohnzimmer_Thermostat_cur.postUpdate(temp)
 end
 
 //
@@ -130,17 +204,18 @@ when
     Item ST1_cur changed
 then
     Schlafzimmer_Thermostat_cur.postUpdate(ST1_cur.state)
+    HK_Schlafzimmer_Thermostat_cur.postUpdate(ST1_cur.state)
 end
 
 rule "ST_sync1"
 when
     Item ST1_set received update
 then
-    if(Math.abs((ST1_set.state as Number).doubleValue - (Schlafzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
-        logWarn("HOMEMATIC", "Detected manual change on ST1: "  + Schlafzimmer_Thermostat_set.state + " -> " + ST1_set.state)
-        Schlafzimmer_Thermostat_set.postUpdate(ST1_set.state)
+    var value = Math.round((ST1_set.state as Number).doubleValue * 2.0) / 2.0
+    if(ST_set != value && ST_prevent_manual == false){
+        logWarn("HOMEMATIC", "Detected manual change on ST1: " + ST_set + " -> " + value)
+        ST_set = value
     }
-
 end
 
 //
@@ -151,15 +226,17 @@ when
     Item BT1_cur changed
 then
     Bad_Thermostat_cur.postUpdate(BT1_cur.state)
+    HK_Bad_Thermostat_cur.postUpdate(BT1_cur.state)
 end
 
 rule "BT_sync1"
 when
     Item BT1_set received update
 then
-    if(Math.abs((BT1_set.state as Number).doubleValue - (Bad_Thermostat_set.state as Number).doubleValue) > 0.1){
-        logWarn("HOMEMATIC", "Detected manual change on BT1: " + Bad_Thermostat_set.state + " -> " + BT1_set.state)
-        Bad_Thermostat_set.postUpdate(BT1_set.state)
+    var value = Math.round((BT1_set.state as Number).doubleValue * 2.0) / 2.0
+    if(BT_set != value && BT_prevent_manual == false){
+        logWarn("HOMEMATIC", "Detected manual change on BT1: " + BT_set + " -> " + value)
+        BT_set = value
     }
 
 end
@@ -172,12 +249,10 @@ rule "WT_sync1"
 when
     Item WT1_set received update
 then
-    if(Math.abs((WT1_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
-        logWarn("HOMEMATIC", "Detected manual change on WT1: " + Wohnzimmer_Thermostat_set.state + " -> " + WT1_set.state)
-        Wohnzimmer_Thermostat_set.postUpdate(WT1_set.state)
-        Thread::sleep(250)
-        WT2_set.sendCommand(WT1_set.state)
-        WT3_set.sendCommand(WT1_set.state)
+    var value = Math.round((WT1_set.state as Number).doubleValue * 2.0) / 2.0
+    if(WT_set != value && WT_prevent_manual == false){
+        logWarn("HOMEMATIC", "Detected manual change on WT1: " + WT_set + " -> " + value)
+        WT_set = value
     }
 end
 
@@ -185,12 +260,10 @@ rule "WT_sync2"
 when
     Item WT2_set received update
 then
-    if(Math.abs((WT2_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
-        logWarn("HOMEMATIC", "Detected manual change on WT2: " + Wohnzimmer_Thermostat_set.state + " -> " + WT2_set.state)
-        Wohnzimmer_Thermostat_set.postUpdate(WT2_set.state)
-        Thread::sleep(250)
-        WT1_set.sendCommand(WT2_set.state)
-        WT3_set.sendCommand(WT2_set.state)
+    var value = Math.round((WT2_set.state as Number).doubleValue * 2.0) / 2.0
+    if(WT_set != value && WT_prevent_manual == false){
+        logWarn("HOMEMATIC", "Detected manual change on WT2: " + WT_set + " -> " + value)
+        WT_set = value
     }
 end
 
@@ -198,12 +271,10 @@ rule "WT_sync3"
 when
     Item WT3_set received update
 then
-    if(Math.abs((WT3_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
-        logWarn("HOMEMATIC", "Detected manual change on WT3: " + Wohnzimmer_Thermostat_set.state + " -> " + WT3_set.state)
-        Wohnzimmer_Thermostat_set.postUpdate(WT3_set.state)
-        Thread::sleep(250)
-        WT1_set.sendCommand(WT3_set.state)
-        WT2_set.sendCommand(WT3_set.state)
+    var value = Math.round((WT3_set.state as Number).doubleValue * 2.0) / 2.0
+    if(WT_set != value && WT_prevent_manual == false){
+        logWarn("HOMEMATIC", "Detected manual change on WT3: " + WT_set + " -> " + value)
+        WT_set = value
     }
 end
 
