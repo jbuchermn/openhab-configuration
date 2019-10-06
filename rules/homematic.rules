@@ -1,0 +1,198 @@
+
+import java.util.concurrent.locks.ReentrantLock
+
+val ReentrantLock downward_lock = new ReentrantLock
+
+//
+// Wohnzimmer Thermostat - Commands from GA / HK
+//
+rule "WT_downward1"
+when
+    Item Wohnzimmer_Thermostat_mode received command 
+then
+    logWarn("HOMEMATIC", "Thermostat Wohnzimmer - GA binding: " + receivedCommand)
+end
+
+rule "WT_downward2"
+when
+    Item HK_Wohnzimmer_Thermostat_mode received command 
+then
+    logWarn("HOMEMATIC", "Thermostat Wohnzimmer - HK binding: " + receivedCommand)
+end
+
+rule "WT_downward3"
+when
+    Item Wohnzimmer_Thermostat_set received command 
+then
+    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+
+    try {
+        downward_lock.lock()
+        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - GA / HK binding: " + temp)
+        Wohnzimmer_Thermostat_set.postUpdate(temp)
+        Thread::sleep(250)
+        WT1_set.sendCommand(temp)
+        WT2_set.sendCommand(temp)
+        WT3_set.sendCommand(temp)
+        Thread::sleep(1250)
+    } catch(Throwable t) { }
+    finally {
+        downward_lock.unlock()
+    }
+end
+
+//
+// Schlafzimmer Thermostat - Commands from GA / HK
+//
+rule "ST_downward1"
+when
+    Item Schlafzimmer_Thermostat_mode received command 
+then
+    logWarn("HOMEMATIC", "Thermostat Schlafzimmer - GA binding: " + receivedCommand)
+end
+
+rule "ST_downward2"
+when
+    Item Schlafzimmer_Thermostat_set received command 
+then
+    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+
+    try {
+        downward_lock.lock()
+    	logWarn("HOMEMATIC", "Thermostat Schlafzimmer - GA binding: " + temp)
+    	Schlafzimmer_Thermostat_set.postUpdate(temp)
+        Thread::sleep(250)
+    	ST1_set.sendCommand(temp)
+        Thread::sleep(1250)
+    } catch(Throwable t) { }
+    finally {
+        downward_lock.unlock()
+    }
+end
+
+//
+// Bad Thermostat - Commands from GA / HK
+//
+rule "BT_downward1"
+when
+    Item Bad_Thermostat_mode received command 
+then
+    logWarn("HOMEMATIC", "Thermostat Bad - GA binding: " + receivedCommand)
+end
+
+rule "BT_downward2"
+when
+    Item Bad_Thermostat_set received command 
+then
+    var temp = Math.round( (receivedCommand as Number).doubleValue * 2.0 ) / 2.0
+
+    try {
+        downward_lock.lock()
+        logWarn("HOMEMATIC", "Thermostat Bad - GA binding: " + temp)
+        Bad_Thermostat_set.postUpdate(temp)
+        Thread::sleep(250)
+        BT1_set.sendCommand(temp)
+        Thread::sleep(1250)
+    } catch(Throwable t) { }
+    finally {
+        downward_lock.unlock()
+    }
+end
+
+//
+// Wohnzimmer Thermostat - Update current temperature to GA / HK
+//
+rule "WT_upward1"
+when
+    Item WT1_cur changed or
+    Item WT2_cur changed or
+    Item WT3_cur changed
+then
+    Wohnzimmer_Thermostat_cur.postUpdate(((WT1_cur.state as Number).doubleValue + (WT2_cur.state as Number).doubleValue + (WT3_cur.state as Number).doubleValue) / 3.0)
+end
+
+//
+// Schlafzimmer Thermostat - Update current and set temperature to GA / HK
+//
+rule "ST_upward1"
+when
+    Item ST1_cur changed
+then
+    Schlafzimmer_Thermostat_cur.postUpdate(ST1_cur.state)
+end
+
+rule "ST_sync1"
+when
+    Item ST1_set received update
+then
+    if(Math.abs((ST1_set.state as Number).doubleValue - (Schlafzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
+        logWarn("HOMEMATIC", "Detected manual change on ST1: "  + Schlafzimmer_Thermostat_set.state + " -> " + ST1_set.state)
+        Schlafzimmer_Thermostat_set.postUpdate(ST1_set.state)
+    }
+
+end
+
+//
+// Bad Thermostat - Update current and set temperature to GA / HK
+//
+rule "BT_upward1"
+when
+    Item BT1_cur changed
+then
+    Bad_Thermostat_cur.postUpdate(BT1_cur.state)
+end
+
+rule "BT_sync1"
+when
+    Item BT1_set received update
+then
+    if(Math.abs((BT1_set.state as Number).doubleValue - (Bad_Thermostat_set.state as Number).doubleValue) > 0.1){
+        logWarn("HOMEMATIC", "Detected manual change on BT1: " + Bad_Thermostat_set.state + " -> " + BT1_set.state)
+        Bad_Thermostat_set.postUpdate(BT1_set.state)
+    }
+
+end
+
+
+//
+// Wohnzimmer Thermostat - Sync all thermos and inform GA / HK about manual chenges
+//
+rule "WT_sync1"
+when
+    Item WT1_set received update
+then
+    if(Math.abs((WT1_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
+        logWarn("HOMEMATIC", "Detected manual change on WT1: " + Wohnzimmer_Thermostat_set.state + " -> " + WT1_set.state)
+        Wohnzimmer_Thermostat_set.postUpdate(WT1_set.state)
+        Thread::sleep(250)
+        WT2_set.sendCommand(WT1_set.state)
+        WT3_set.sendCommand(WT1_set.state)
+    }
+end
+
+rule "WT_sync2"
+when
+    Item WT2_set received update
+then
+    if(Math.abs((WT2_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
+        logWarn("HOMEMATIC", "Detected manual change on WT2: " + Wohnzimmer_Thermostat_set.state + " -> " + WT2_set.state)
+        Wohnzimmer_Thermostat_set.postUpdate(WT2_set.state)
+        Thread::sleep(250)
+        WT1_set.sendCommand(WT2_set.state)
+        WT3_set.sendCommand(WT2_set.state)
+    }
+end
+
+rule "WT_sync3"
+when
+    Item WT3_set received update
+then
+    if(Math.abs((WT3_set.state as Number).doubleValue - (Wohnzimmer_Thermostat_set.state as Number).doubleValue) > 0.1){
+        logWarn("HOMEMATIC", "Detected manual change on WT3: " + Wohnzimmer_Thermostat_set.state + " -> " + WT3_set.state)
+        Wohnzimmer_Thermostat_set.postUpdate(WT3_set.state)
+        Thread::sleep(250)
+        WT1_set.sendCommand(WT3_set.state)
+        WT2_set.sendCommand(WT3_set.state)
+    }
+end
+
