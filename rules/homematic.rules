@@ -215,6 +215,7 @@ then
     if(ST_set != value && ST_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on ST1: " + ST_set + " -> " + value)
         ST_set = value
+        ST_prevent_manual = true
     }
 end
 
@@ -237,6 +238,7 @@ then
     if(BT_set != value && BT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on BT1: " + BT_set + " -> " + value)
         BT_set = value
+        BT_prevent_manual = true
     }
 
 end
@@ -253,6 +255,7 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT1: " + WT_set + " -> " + value)
         WT_set = value
+        WT_prevent_manual = true
     }
 end
 
@@ -264,6 +267,7 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT2: " + WT_set + " -> " + value)
         WT_set = value
+        WT_prevent_manual = true
     }
 end
 
@@ -275,6 +279,7 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT3: " + WT_set + " -> " + value)
         WT_set = value
+        WT_prevent_manual = true
     }
 end
 
