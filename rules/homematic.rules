@@ -22,25 +22,25 @@ then
     HK_Schlafzimmer_Thermostat_mode.postUpdate("HeatOn")
     HK_Bad_Thermostat_mode.postUpdate("HeatOn")
 
-    WT1_cur.postUpdate(18.0)
-    WT1_set.postUpdate(18.0)
-    WT2_cur.postUpdate(18.0)
-    WT2_set.postUpdate(18.0)
-    WT3_cur.postUpdate(18.0)
-    WT3_set.postUpdate(18.0)
-    ST1_cur.postUpdate(18.0)
-    ST1_set.postUpdate(18.0)
-    BT1_cur.postUpdate(18.0)
-    BT1_set.postUpdate(18.0)
+    if(WT1_cur.state === null){ WT1_cur.postUpdate(18.0) }
+    if(WT1_set.state === null){ WT1_set.postUpdate(18.0) }
+    if(WT2_cur.state === null){ WT2_cur.postUpdate(18.0) }
+    if(WT2_set.state === null){ WT2_set.postUpdate(18.0) }
+    if(WT3_cur.state === null){ WT3_cur.postUpdate(18.0) }
+    if(WT3_set.state === null){ WT3_set.postUpdate(18.0) }
+    if(ST1_cur.state === null){ ST1_cur.postUpdate(18.0) }
+    if(ST1_set.state === null){ ST1_set.postUpdate(18.0) }
+    if(BT1_cur.state === null){ BT1_cur.postUpdate(18.0) }
+    if(BT1_set.state === null){ BT1_set.postUpdate(18.0) }
 
-    Wohnzimmer_Thermostat_set.postUpdate(18.0)
-    HK_Wohnzimmer_Thermostat_set.postUpdate(18.0)
+    Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+    HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
 
-    Schlafzimmer_Thermostat_set.postUpdate(18.0)
-    HK_Schlafzimmer_Thermostat_set.postUpdate(18.0)
+    Schlafzimmer_Thermostat_set.postUpdate(ST_set)
+    HK_Schlafzimmer_Thermostat_set.postUpdate(ST_set)
 
-    Bad_Thermostat_set.postUpdate(18.0)
-    HK_Bad_Thermostat_set.postUpdate(18.0)
+    Bad_Thermostat_set.postUpdate(BT_set)
+    HK_Bad_Thermostat_set.postUpdate(BT_set)
 end
 
 //
@@ -75,23 +75,14 @@ then
             var WT3_set_state = Math.round((WT3_set.state as Number).doubleValue * 2.0) / 2.0
             if(WT_set != WT1_set_state) {
 	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (1): " + WT_set + " (before: " + WT1_set.state + ")")
-
-	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
-	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
 	        WT1_set.sendCommand(WT_set)
             }
             if(WT_set != WT2_set_state) {
 	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (2): " + WT_set + " (before: " + WT2_set.state + ")")
-
-	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
-	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
 	        WT2_set.sendCommand(WT_set)
             }
             if(WT_set != WT3_set_state) {
 	        logWarn("HOMEMATIC", "Thermostat Wohnzimmer - Forcing downward (3): " + WT_set + " (before: " + WT3_set.state + ")")
-
-	        Wohnzimmer_Thermostat_set.postUpdate(WT_set)
-	        HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
 	        WT3_set.sendCommand(WT_set)
             }
 
@@ -130,9 +121,6 @@ then
             var ST1_set_state = Math.round((ST1_set.state as Number).doubleValue * 2.0) / 2.0
             if(ST_set != ST1_set_state) {
 	        logWarn("HOMEMATIC", "Thermostat Schlafzimmer - Forcing downward: " + ST_set + " (before: " + ST1_set.state + ")")
-
-	        Schlafzimmer_Thermostat_set.postUpdate(ST_set)
-	        HK_Schlafzimmer_Thermostat_set.postUpdate(ST_set)
 	        ST1_set.sendCommand(ST_set)
             }
 
@@ -171,9 +159,6 @@ then
             var BT1_set_state = Math.round((BT1_set.state as Number).doubleValue * 2.0) / 2.0
             if(BT_set != BT1_set_state) {
 	        logWarn("HOMEMATIC", "Thermostat Bad - Forcing downward: " + BT_set + " (before: " + BT1_set.state + ")")
-
-	        Bad_Thermostat_set.postUpdate(BT_set)
-	        HK_Bad_Thermostat_set.postUpdate(BT_set)
 	        BT1_set.sendCommand(BT_set)
             }
 
@@ -215,6 +200,9 @@ then
     if(ST_set != value && ST_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on ST1: " + ST_set + " -> " + value)
         ST_set = value
+	Schlafzimmer_Thermostat_set.postUpdate(ST_set)
+	HK_Schlafzimmer_Thermostat_set.postUpdate(ST_set)
+
         ST_prevent_manual = true
     }
 end
@@ -238,6 +226,9 @@ then
     if(BT_set != value && BT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on BT1: " + BT_set + " -> " + value)
         BT_set = value
+	Bad_Thermostat_set.postUpdate(BT_set)
+	HK_Bad_Thermostat_set.postUpdate(BT_set)
+
         BT_prevent_manual = true
     }
 
@@ -255,6 +246,9 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT1: " + WT_set + " -> " + value)
         WT_set = value
+	Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+
         WT_prevent_manual = true
     }
 end
@@ -267,6 +261,9 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT2: " + WT_set + " -> " + value)
         WT_set = value
+	Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+
         WT_prevent_manual = true
     }
 end
@@ -279,6 +276,9 @@ then
     if(WT_set != value && WT_prevent_manual == false){
         logWarn("HOMEMATIC", "Detected manual change on WT3: " + WT_set + " -> " + value)
         WT_set = value
+	Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+	HK_Wohnzimmer_Thermostat_set.postUpdate(WT_set)
+
         WT_prevent_manual = true
     }
 end
